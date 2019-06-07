@@ -29,3 +29,21 @@ services:
     volumes:
       - ./your_data_volume:/your_data_volume
 ```
+
+## Publishing
+
+Images are auto-built from github.
+
+
+|Git              |Docker tag|Notes |
+|-----------------|----------|------|
+|`master` branch  |`latest`  |Unstable|
+|`0.0.0` branches |`0.0.0`   |Unstable, version represents rclone version|
+|`0.0.0-rX` tags  |`0.0.0-rX`|Stable, corresponds to rclone version docker image stable release number|
+
+### Manual push
+
+```
+docker build -t olivierdalang/rclone-backup:latest .
+docker push olivierdalang/rclone-backup:latest
+```
