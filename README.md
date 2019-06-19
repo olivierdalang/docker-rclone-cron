@@ -20,6 +20,7 @@ services:
     image: olivierdalang/rclone-backup:latest
     environment:
       - RCLONE_CRON_SCHEDULE=0 * * * *
+      - RCLONE_COMMAND=sync
       - RCLONE_SOURCE_PATH=/your_data_volume
       - RCLONE_DESTINATION_PATH=MYDROPBOX:some_path_here
       - RCLONE_CONFIG_MYDROPBOX_TYPE=dropbox

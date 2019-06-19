@@ -2,7 +2,7 @@
 set -e
 
 # constructing the command
-COMMAND="rclone copy -v \"$RCLONE_SOURCE_PATH\" \"$RCLONE_DESTINATION_PATH\""
+COMMAND="rclone $RCLONE_COMMAND -v \"$RCLONE_SOURCE_PATH\" \"$RCLONE_DESTINATION_PATH\""
 
 # debug statement
 echo "The command is : $COMMAND"
