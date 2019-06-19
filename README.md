@@ -8,7 +8,25 @@ See on Docker hub : https://hub.docker.com/r/olivierdalang/rclone-backup
 
 ## Usage
 
-Example setup for Dropbox (`docker-compose.yml`) :
+These are the env vars to configure :
+
+- `RCLONE_CRON_SCHEDULE=0 0 * * *` : the cron schedule for the sync job (see cron doc)
+- `RCLONE_COMMAND=copy` : the rclond command (most common is `copy` or `sync`)
+- `RCLONE_SOURCE_PATH` : the source path, can be a local directory, or a remote directory if prefixed with `MYREMOTE:`
+- `RCLONE_DESTINATION_PATH` : the destination path, can be a local directory, or a remote directory if prefixed with `MYREMOTE:`
+- `RCLONE_CONFIG_MYREMOTE_TYPE` : provider type of MYREMOTE (e.g. `dropbox`, `s3`, ...)
+- `RCLONE_CONFIG_MYREMOTE_...` : provider specific setting
+
+You can define two remotes to copy/sync from remote to remote.
+
+These settings come together in the crontab like this :
+```
+$RCLONE_CRON_SCHEDULE rclone $RCLONE_COMMAND -v "$RCLONE_SOURCE_PATH" "$RCLONE_DESTINATION_PATH"
+```
+
+## Example
+
+Example `docker-compose.yml` to backup a docker volume to Dropbox.
 
 ```
 version: '3.4'
