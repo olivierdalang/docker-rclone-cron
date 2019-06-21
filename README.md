@@ -1,32 +1,39 @@
-# docker-rclone-backup
+# docker-rclone-cron
 
-This is a very lightweight Docker image that runs rclone as a cronjob (inspired from https://github.com/openbridge/ob_bulkstash).
+This is a very lightweight Docker image that runs **rclone** as
+a **cronjob** (inspired from https://github.com/openbridge/ob_bulkstash).
 
-Rclone being entierly configurable with environment variables (https://rclone.org/docs/#environment-variables), it should be pretty flexible.
+It makes **backuping tasks** or other **syncing tasks** very easy.
+Rclone being entierly configurable with environment variables
+(https://rclone.org/docs/#environment-variables), it should be
+pretty flexible.
 
-See on Docker hub : https://hub.docker.com/r/olivierdalang/rclone-backup
+See on Docker hub : https://hub.docker.com/r/olivierdalang/rclone-cron
 
 ## Usage
 
-These are the env vars to configure :
-
-- `RCLONE_CRON_SCHEDULE=0 0 * * *` : the cron schedule for the sync job (see cron doc)
-- `RCLONE_COMMAND=copy` : the rclond command (most common is `copy` or `sync`)
-- `RCLONE_SOURCE_PATH` : the source path, can be a local directory, or a remote directory if prefixed with `MYREMOTE:`
-- `RCLONE_DESTINATION_PATH` : the destination path, can be a local directory, or a remote directory if prefixed with `MYREMOTE:`
-- `RCLONE_CONFIG_MYREMOTE_TYPE` : provider type of MYREMOTE (e.g. `dropbox`, `s3`, ...)
-- `RCLONE_CONFIG_MYREMOTE_...` : provider specific setting
-
-You can define two remotes to copy/sync from remote to remote.
-
-These settings come together in the crontab like this :
 ```
-$RCLONE_CRON_SCHEDULE rclone $RCLONE_COMMAND -v "$RCLONE_SOURCE_PATH" "$RCLONE_DESTINATION_PATH"
+docker run \
+    -v ./backups/:/backups/ \
+    -e "CRON_SCHEDULE=0 0 * * *" \
+    -e "RCLONE_CONFIG_MYREMOTE_TYPE=s3" \
+    -e "RCLONE_CONFIG_MYREMOTE_ACCESS_KEY_ID=XXX" \
+    -e "RCLONE_CONFIG_MYREMOTE_SECRET_ACCESS_KEY=YYY" \
+    olivierdalang/rclone-cron \
+    rclone copy /backups/ MYREMOTE:/path/where/to/backup/
 ```
+
+The command is executed once on container startup (to test the config), and if
+it succeeded, cron will start in foreground.
+
+See rclone's documentation for the command syntax and the `RCLONE_CONFIG_*`
+configuration. See cron documentation for `CRON_SCHEDULE`.
+
+You could also define two remotes to do a remote-to-remote sync/copy.
 
 ## Example
 
-Example `docker-compose.yml` to backup a docker volume to Dropbox.
+Example `docker-compose.yml` to sync a docker volume to Dropbox.
 
 ```
 version: '3.4'
@@ -35,12 +42,10 @@ services:
   ... your other services here
 
   backup:
-    image: olivierdalang/rclone-backup:latest
+    image: olivierdalang/rclone-cron:latest    
+    command: rclone sync -v /your_data_volume MYDROPBOX:some_path_here
     environment:
-      - RCLONE_CRON_SCHEDULE=0 * * * *
-      - RCLONE_COMMAND=sync
-      - RCLONE_SOURCE_PATH=/your_data_volume
-      - RCLONE_DESTINATION_PATH=MYDROPBOX:some_path_here
+      - CRON_SCHEDULE=0 * * * *
       - RCLONE_CONFIG_MYDROPBOX_TYPE=dropbox
       - RCLONE_CONFIG_MYDROPBOX_CLIENT_ID=xxx
       - RCLONE_CONFIG_MYDROPBOX_CLIENT_SECRET=yyy
@@ -58,11 +63,11 @@ Images are auto-built from github.
 |-----------------|----------|------|
 |`master` branch  |`latest`  |Unstable|
 |`0.0.0` branches |`0.0.0`   |Unstable, version represents rclone version|
-|`0.0.0-rX` tags  |`0.0.0-rX`|Stable, corresponds to rclone version docker image stable release number|
+|`0.0.0-rX` tags  |`0.0.0-rX`|Stable, version represents rclone version and rX the stable build number|
 
 ### Manual push
 
 ```
-docker build -t olivierdalang/rclone-backup:latest .
-docker push olivierdalang/rclone-backup:latest
+docker build -t olivierdalang/rclone-cron:latest .
+docker push olivierdalang/rclone-cron:latest
 ```

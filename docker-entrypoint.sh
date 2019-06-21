@@ -1,17 +1,17 @@
 #!/bin/sh
 set -e
 
-# constructing the command
-COMMAND="rclone $RCLONE_COMMAND -v \"$RCLONE_SOURCE_PATH\" \"$RCLONE_DESTINATION_PATH\""
+CRONJOB="$CRON_SCHEDULE $@"
 
-# debug statement
-echo "The command is : $COMMAND"
+echo "This cron job will be added :"
+echo "$CRONJOB"
 
-# running the command once, so that the container stops if it is misconfigured
-eval "$COMMAND"
+echo "Installing the cron job..."
+echo "$CRONJOB" > /etc/crontabs/root
 
-# setting up cron
-echo "$RCLONE_CRON_SCHEDULE $COMMAND" > /etc/crontabs/root
+echo "We run the command once (initial check)..."
+eval "$@"
 
 # run the CMD
-exec "$@"
+echo "First sync was successful, starting cron !"
+crond -f

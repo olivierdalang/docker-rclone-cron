@@ -16,8 +16,7 @@ ADD docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
 # defaults env vars
-ENV RCLONE_COMMAND=copy
-ENV RCLONE_CRON_SCHEDULE=0\ 0\ *\ *\ *
+ENV CRON_SCHEDULE="0 0 * * *"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["crond", "-f"]
+CMD ["rclone", "version"]
