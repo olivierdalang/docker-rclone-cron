@@ -16,14 +16,14 @@ See on Docker hub : https://hub.docker.com/r/olivierdalang/rclone-cron
 docker run \
     -v ./backups/:/backups/ \
     -e "CRON_SCHEDULE=0 0 * * *" \
+    -e "COMMAND=rclone copy /backups/ MYREMOTE:/path/where/to/backup/" \
     -e "RCLONE_CONFIG_MYREMOTE_TYPE=s3" \
     -e "RCLONE_CONFIG_MYREMOTE_ACCESS_KEY_ID=XXX" \
     -e "RCLONE_CONFIG_MYREMOTE_SECRET_ACCESS_KEY=YYY" \
-    olivierdalang/rclone-cron \
-    rclone copy /backups/ MYREMOTE:/path/where/to/backup/
+    olivierdalang/rclone-cron
 ```
 
-The command is executed once on container startup (to test the config), and if
+`COMMAND` is executed once on container startup (to test the config), and if
 it succeeded, cron will start in foreground.
 
 See rclone's documentation for the command syntax and the `RCLONE_CONFIG_*`
@@ -42,10 +42,10 @@ services:
   ... your other services here
 
   backup:
-    image: olivierdalang/rclone-cron:latest    
-    command: rclone sync -v /your_data_volume MYDROPBOX:some_path_here
+    image: olivierdalang/rclone-cron:latest
     environment:
       - CRON_SCHEDULE=0 * * * *
+      - COMMAND=rclone sync -v /your_data_volume MYDROPBOX:some_path_here
       - RCLONE_CONFIG_MYDROPBOX_TYPE=dropbox
       - RCLONE_CONFIG_MYDROPBOX_CLIENT_ID=xxx
       - RCLONE_CONFIG_MYDROPBOX_CLIENT_SECRET=yyy
