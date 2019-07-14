@@ -54,6 +54,29 @@ services:
       - ./your_data_volume:/your_data_volume
 ```
 
+### One-shot
+
+You can use the same image to do a one-shot sync, in this example from Dropbox to S3
+
+Create the environement variables `nano temp-env` :
+```
+RCLONE_CONFIG_MYDROPBOX_TYPE=dropbox
+RCLONE_CONFIG_MYDROPBOX_CLIENT_ID=xxx
+RCLONE_CONFIG_MYDROPBOX_CLIENT_SECRET=yyy
+RCLONE_CONFIG_MYDROPBOX_TOKEN={"access_token":"zzz-LwUL7bnOZm3_Kl9MEGzXh7f7SL_F","token_type":"bearer","expiry":"0001-01-01T00:00:00Z"}
+RCLONE_CONFIG_MYS3_TYPE=s3
+RCLONE_CONFIG_MYS3_ENDPOINT=https://aaa
+RCLONE_CONFIG_MYS3_ACCESS_KEY_ID=bbb
+RCLONE_CONFIG_MYS3_REGION=ccc
+RCLONE_CONFIG_MYS3_SECRET_ACCESS_KEY=ddd
+RCLONE_CONFIG_MYS3_ACL=public-read
+```
+
+Run the container in detched mode :
+```
+docker run --entrypoint "/bin/sh" --env-file temp -d olivierdalang/rclone-cron -c 'rclone -v sync MYDROPBOX:path/in/your/dropbox MYS3:your_bucket'
+```
+
 ## Publishing
 
 Images are auto-built from github.
